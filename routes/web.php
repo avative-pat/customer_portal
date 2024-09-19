@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\SubdivisionController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\WiFiController; // Add WiFiController to the imports
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -120,6 +121,12 @@ Route::middleware('language')->group(function () {
             Route::get('/', [ContractController::class, 'index']);
             Route::get('/{contracts}', [ContractController::class, 'downloadContractPdf']);
         });
+
+        /**
+         * WiFi Management routes (Added)
+         */
+        Route::get('/router/settings', [WiFiController::class, 'showRouterSettings'])->name('router.settings');
+        Route::post('/router/settings', [WiFiController::class, 'updateRouter'])->name('router.update');
     });
 
     Route::get('/logout', [AuthenticationController::class, 'logout']);
