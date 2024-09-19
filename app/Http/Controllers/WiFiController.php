@@ -20,8 +20,8 @@ class WiFiController extends Controller
             'password' => 'hiddenpassword' // Example Password
         ];
 
-        // Return the view with the router details.
-        return view('router.settings', compact('routerDetails'));
+        // Pass the variable to the view
+    return view('pages.billing.index', compact('routerDetails'));
     }
 
     /**
