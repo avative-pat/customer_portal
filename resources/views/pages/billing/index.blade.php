@@ -194,6 +194,7 @@
             @endif
 
             <!-- WiFi Router Management Card (Added Last) -->
+            @isset($routerDetails)
             <div class="col-12 col-xl-6">
                <div class="card">
                   <div class="card-header">
@@ -224,6 +225,7 @@
                   </div>
                </div>
             </div>
+            @endisset
 
          </div>
       </div>
