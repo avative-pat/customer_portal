@@ -13,15 +13,23 @@ class WiFiController extends Controller
      */
     public function showRouterSettings()
     {
-        // Simulate fetching the router details (SSID and Password) from the database or external service.
-        // In practice, you'd pull these details from a database or API.
+        // Define the router details (typically this would come from a database or an external API)
         $routerDetails = [
-            'ssid' => 'HomeNetwork', // Example SSID
+            'ssid' => 'HomeNetwork',  // Example SSID
             'password' => 'hiddenpassword' // Example Password
         ];
 
-        // Pass the variable to the view
-    return view('pages.billing.index', compact('routerDetails'));
+        // Debugging log to verify the router details are being set
+        \Log::info('Router Details:', $routerDetails);
+
+        // Check if the router details are not empty before passing to the view
+        if (empty($routerDetails)) {
+            // Return an error response if the router details are missing
+            return response()->json(['error' => 'Router details not found'], 500);
+        }
+
+        // Pass the $routerDetails to the view
+        return view('pages.billing.index', compact('routerDetails'));
     }
 
     /**
@@ -43,8 +51,11 @@ class WiFiController extends Controller
         $password = $request->input('password');
 
         // Simulate saving the new settings to the database or external API
-        // In practice, you'd update the database or send a request to the router management API.
+        // In a real-world scenario, you would persist these values into a database or update via API
         // Example: RouterService::updateCredentials($ssid, $password);
+
+        // Log the update for debugging purposes
+        \Log::info('Updated Router Settings:', ['ssid' => $ssid, 'password' => $password]);
 
         // Flash a success message to the session
         session()->flash('success', 'WiFi settings have been updated successfully.');
