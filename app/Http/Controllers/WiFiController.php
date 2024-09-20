@@ -19,7 +19,7 @@ class WiFiController extends Controller
      */
     public function index(): \Illuminate\Http\Response
     {
-        return view('wifi.index');
+        return view('pages.wifi.index');
     }
 
     /**
