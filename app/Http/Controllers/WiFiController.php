@@ -13,6 +13,16 @@ class WiFiController extends Controller
     }
 
     /**
+     * Display a listing of the WiFi equipment.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(): \Illuminate\Http\Response
+    {
+        return view('wifi.index');
+    }
+
+    /**
      * Show the WiFi router management page with current SSID and password.
      *
      * @return \Illuminate\Http\Response
