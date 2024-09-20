@@ -47,6 +47,7 @@ class WiFiController extends Controller
     {
         // Define the router details with dummy test values
         $routerDetails = [
+            'id' => 123,  // Dummy ID for testing
             'ssid' => 'TestNetwork',  // Dummy SSID
             'password' => 'testpassword123' // Dummy Password
         ];
