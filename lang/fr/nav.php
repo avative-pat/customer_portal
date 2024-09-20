@@ -3,6 +3,7 @@
 return [
     'logOut' => 'Déconnexion',
     'billing' => 'Facturation',
+    'wifi' => 'Équipement',
     'myAccount' => 'MON COMPTE',
     'profile' => 'Mes coordonnées',
     'tickets' => 'Billets de soutien',

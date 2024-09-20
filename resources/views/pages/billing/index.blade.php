@@ -202,7 +202,7 @@
                      </h4>
                   </div>
                   <div class="card-body">
-                     @if(isset($routerDetails))
+                     @if(!empty($routerDetails))
                      <!-- Display the SSID and Password Form -->
                      <form method="POST" action="{{ action([\App\Http\Controllers\WiFiController::class, 'updateRouter']) }}">
                         @csrf
