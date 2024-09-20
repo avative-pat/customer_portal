@@ -11,7 +11,7 @@ class WiFiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function showRouterSettings()
+    public function showRouterSettings(): \Illuminate\Http\Response
     {
         // Define the router details (typically this would come from a database or an external API)
         $routerDetails = [
