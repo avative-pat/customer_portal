@@ -129,7 +129,7 @@ Route::middleware('language')->group(function () {
             Route::get('/', [WiFiController::class, 'index']);
             Route::get('/create', [WiFiController::class, 'create']);
             Route::post('/store', [WiFiController::class, 'store']);
-            Route::get('/{id}', [WiFiController::class, 'show']);
+            Route::get('/{id}', [WiFiController::class, 'index']);
             Route::get('/{id}/edit', [WiFiController::class, 'edit']);
             Route::patch('/{id}', [WiFiController::class, 'update']);
             Route::put('/update-router', [WiFiController::class, 'updateRouter']);

@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form id="wifiForm" action="{{ action([WiFiController::class, 'update']) }}" method="POST">
+                        <form id="wifiForm" action="{{ action([WiFiController::class, 'update'], ['id' => $id]) }}" method="POST">
                             @csrf
 
                             <!-- Equipment ID Section -->
