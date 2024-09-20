@@ -19,7 +19,10 @@ class WiFiController extends Controller
      */
     public function index(): \Illuminate\Http\Response
     {
-        return response()->view('pages.wifi.index');
+        $routerDetails = $this->getRouterDetails();
+
+        // Ensure the 'id' parameter is passed to the view
+        return response()->view('pages.wifi.index', ['id' => $routerDetails['id']]);
     }
 
     /**

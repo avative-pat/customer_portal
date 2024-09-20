@@ -36,15 +36,21 @@
                         <form id="wifiForm" action="{{ action([WiFiController::class, 'update']) }}" method="POST">
                             @csrf
 
+                            <!-- Equipment ID Section -->
+                            <div class="form-group">
+                                <label for="equipment_id">Equipment ID</label>
+                                <input type="text" class="form-control" id="equipment_id" name="equipment_id" value="{{ $id }}" disabled>
+                            </div>
+
                             <div class="form-group">
                                 <label for="ssid">SSID</label>
-                                <input type="text" class="form-control" id="ssid" name="ssid" value="{{ $routerDetails['SSID'] }}" disabled>
+                                <input type="text" class="form-control" id="ssid" name="ssid" value="{{ $routerDetails['ssid'] }}" disabled>
                             </div>
 
                             <div class="form-group">
                                 <label for="password">Password</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="password" name="password" value="{{ $routerDetails['Password'] }}" disabled>
+                                    <input type="password" class="form-control" id="password" name="password" value="{{ $routerDetails['password'] }}" disabled>
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-secondary" id="togglePassword">Show</button>
                                     </div>
@@ -81,15 +87,6 @@
             document.getElementById('password').disabled = false;
             document.getElementById('submitButton').style.display = 'inline-block';
             document.getElementById('cancelButton').style.display = 'inline-block';
-            this.style.display = 'none';
-        });
-
-        document.getElementById('cancelButton').addEventListener('click', function () {
-            document.getElementById('ssid').disabled = true;
-            document.getElementById('password').disabled = true;
-            document.getElementById('submitButton').style.display = 'none';
-            this.style.display = 'none';
-            document.getElementById('editButton').style.display = 'inline-block';
         });
     </script>
 @endsection
