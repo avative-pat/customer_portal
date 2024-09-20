@@ -133,6 +133,7 @@ Route::middleware('language')->group(function () {
             Route::get('/{id}/edit', [WiFiController::class, 'edit']);
             Route::patch('/{id}', [WiFiController::class, 'update']);
             Route::put('/update-router', [WiFiController::class, 'updateRouter']);
+        });
     });
 
     Route::get('/logout', [AuthenticationController::class, 'logout']);
