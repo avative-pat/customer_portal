@@ -13,10 +13,10 @@ class WiFiController extends Controller
      */
     public function showRouterSettings(): \Illuminate\Http\Response
     {
-        // Define the router details (typically this would come from a database or an external API)
+        // Define the router details with dummy test values
         $routerDetails = [
-            'ssid' => 'HomeNetwork',  // Example SSID
-            'password' => 'hiddenpassword' // Example Password
+            'ssid' => 'TestNetwork',  // Dummy SSID
+            'password' => 'testpassword123' // Dummy Password
         ];
 
         // Debugging log to verify the router details are being set
