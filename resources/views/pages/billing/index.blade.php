@@ -193,8 +193,7 @@
             </div>
             @endif
 
-            <!-- WiFi Router Management Card (Added Last) -->
-            @isset($routerDetails)
+            <!-- WiFi Router Management Card (Displayed Even If routerDetails is Missing) -->
             <div class="col-12 col-xl-6">
                <div class="card">
                   <div class="card-header">
@@ -203,6 +202,8 @@
                      </h4>
                   </div>
                   <div class="card-body">
+                     @if(isset($routerDetails))
+                     <!-- Display the SSID and Password Form -->
                      <form method="POST" action="{{ action([\App\Http\Controllers\WiFiController::class, 'updateRouter']) }}">
                         @csrf
                         <div class="form-group">
@@ -222,10 +223,13 @@
 
                         <button type="submit" class="btn btn-primary">Update WiFi Settings</button>
                      </form>
+                     @else
+                     <!-- Show a Message If No Router Details Are Available -->
+                     <p class="text-danger">No router details found.</p>
+                     @endif
                   </div>
                </div>
             </div>
-            @endisset
 
          </div>
       </div>
