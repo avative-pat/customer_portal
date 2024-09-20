@@ -35,7 +35,7 @@ class WiFiController extends Controller
             return response()->json(['error' => 'Router details not found'], 500);
         }
 
-        return view('wifi.index', compact('routerDetails'));
+        return view('pages.wifi.index', compact('routerDetails'));
     }
 
     /**
@@ -117,14 +117,14 @@ class WiFiController extends Controller
 
         $this->saveNewRouter($validated);
 
-        return redirect()->route('wifi.index')->with('success', 'WiFi Device created successfully.');
+        return redirect()->route('pages.wifi.index')->with('success', 'WiFi Device created successfully.');
     }
 
     public function edit($id)
     {
         $router = $this->getRouterById($id);
         if (!$router) {
-            return redirect()->route('wifi.index')->with('error', 'WiFi Device not found.');
+            return redirect()->route('pages.wifi.index')->with('error', 'WiFi Device not found.');
         }
         return view('wifi.edit', compact('router'));
     }
@@ -138,24 +138,24 @@ class WiFiController extends Controller
 
         $router = $this->getRouterById($id);
         if (!$router) {
-            return redirect()->route('wifi.index')->with('error', 'WiFi Device not found.');
+            return redirect()->route('pages.wifi.index')->with('error', 'WiFi Device not found.');
         }
 
         $this->saveRouterSettings($validated['ssid'], $validated['password'], $id);
 
-        return redirect()->route('wifi.index')->with('success', 'WiFi Device updated successfully.');
+        return redirect()->route('pages.wifi.index')->with('success', 'WiFi Device updated successfully.');
     }
 
     public function destroy($id)
     {
         $router = $this->getRouterById($id);
         if (!$router) {
-            return redirect()->route('wifi.index')->with('error', 'WiFi Device not found.');
+            return redirect()->route('pages.wifi.index')->with('error', 'WiFi Device not found.');
         }
 
         $this->deleteRouter($id);
 
-        return redirect()->route('wifi.index')->with('success', 'WiFi Device deleted successfully.');
+        return redirect()->route('pages.wifi.index')->with('success', 'WiFi Device deleted successfully.');
     }
 
     /**

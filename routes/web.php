@@ -123,10 +123,16 @@ Route::middleware('language')->group(function () {
         });
 
         /**
-         * WiFi Management routes (Added)
+         * Equipment routes
          */
-        Route::get('/router/settings', [WiFiController::class, 'showRouterSettings'])->name('router.settings');
-        Route::post('/router/settings', [WiFiController::class, 'updateRouter'])->name('router.update');
+        Route::prefix('wifi')->group(function () {
+            Route::get('/', [WiFiController::class, 'index']);
+            Route::get('/create', [WiFiController::class, 'create']);
+            Route::post('/store', [WiFiController::class, 'store']);
+            Route::get('/{id}', [WiFiController::class, 'show']);
+            Route::get('/{id}/edit', [WiFiController::class, 'edit']);
+            Route::patch('/{id}', [WiFiController::class, 'update']);
+            Route::put('/update-router', [WiFiController::class, 'updateRouter']);
     });
 
     Route::get('/logout', [AuthenticationController::class, 'logout']);
