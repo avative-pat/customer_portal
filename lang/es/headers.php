@@ -29,7 +29,7 @@ return [
     'bankAccounts' => 'Cuentas Bancarias',
     'summary' => 'Resumen',
     'dashboard' => 'Tablero',
-    'yourPlan' => 'Tu Plan',
+    'internetPlan' => 'Plan de Internet',
     'serviceDetails' => 'Detalles del Servicio',
     'downloadSpeed' => 'Velocidad de Descarga',
     'uploadSpeed' => 'Velocidad de Carga',

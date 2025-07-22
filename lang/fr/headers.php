@@ -26,7 +26,7 @@ return [
     'currentDataUsage' => 'Utilisation actuelle de données',
     'allPaid' => 'Tout payé!',
     'dashboard' => 'Tableau de bord',
-    'yourPlan' => 'Votre Plan',
+    'internetPlan' => 'Plan Internet',
     'serviceDetails' => 'Détails du Service',
     'downloadSpeed' => 'Vitesse de Téléchargement',
     'uploadSpeed' => 'Vitesse de Téléversement',

@@ -34,7 +34,7 @@ return [
     'autopay' => 'Autopay',
     'goCardLess' => 'GoCardless',
     'account' => 'Account',
-    'yourPlan' => 'Your Plan',
+    'internetPlan' => 'Internet Plan',
     'serviceDetails' => 'Service Details',
     'downloadSpeed' => 'Download Speed',
     'uploadSpeed' => 'Upload Speed',

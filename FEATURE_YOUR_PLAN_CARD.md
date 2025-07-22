@@ -1,7 +1,7 @@
-# Your Plan Card Feature
+# Internet Plan Card Feature
 
 ## Overview
-This feature enhances the Dashboard view of the Sonar Customer Portal by adding a new "Your Plan" card that displays basic information about the account's data service.
+This feature enhances the Dashboard view of the Sonar Customer Portal by adding a new "Internet Plan" card that displays basic information about the account's data service.
 
 ## Implementation Details
 
@@ -25,12 +25,13 @@ This feature enhances the Dashboard view of the Sonar Customer Portal by adding 
 - Added a new card section that displays when `$currentDataService` is available
 - Card includes:
   - Service name as the main title
-  - Monthly price
-  - Service type (DATA)
-  - Download speed (converted to Mbps when >= 1000 kbps)
-  - Upload speed (converted to Mbps when >= 1000 kbps)
-- Uses responsive Bootstrap grid layout (col-6 for each data point)
+  - Monthly price (full width)
+  - Download speed with down arrow icon (always in Mbps)
+  - Upload speed with up arrow icon (always in Mbps)
+- Service type is not displayed to end users (removed based on feedback)
+- Uses responsive Bootstrap grid layout (col-6 for speed data points)
 - Styled with consistent portal theming (card, badges, icons)
+- Added arrow icons (fe fe-arrow-down, fe fe-arrow-up) for speed indicators
 
 ### Internationalization
 
@@ -38,7 +39,7 @@ This feature enhances the Dashboard view of the Sonar Customer Portal by adding 
 Added new translation keys to support multiple languages:
 
 **English (lang/en/headers.php):**
-- `yourPlan` => 'Your Plan'
+- `internetPlan` => 'Internet Plan'
 - `serviceDetails` => 'Service Details'
 - `downloadSpeed` => 'Download Speed'
 - `uploadSpeed` => 'Upload Speed'
@@ -48,7 +49,7 @@ Added new translation keys to support multiple languages:
 - `kbps` => 'Kbps'
 
 **Spanish (lang/es/headers.php):**
-- `yourPlan` => 'Tu Plan'
+- `internetPlan` => 'Plan de Internet'
 - `serviceDetails` => 'Detalles del Servicio'
 - `downloadSpeed` => 'Velocidad de Descarga'
 - `uploadSpeed` => 'Velocidad de Carga'
@@ -58,7 +59,7 @@ Added new translation keys to support multiple languages:
 - `kbps` => 'Kbps'
 
 **French (lang/fr/headers.php):**
-- `yourPlan` => 'Votre Plan'
+- `internetPlan` => 'Plan Internet'
 - `serviceDetails` => 'Détails du Service'
 - `downloadSpeed` => 'Vitesse de Téléchargement'
 - `uploadSpeed` => 'Vitesse de Téléversement'
@@ -71,12 +72,13 @@ Added new translation keys to support multiple languages:
 
 ### Data Display
 1. **Service Name**: Displays the name of the data service
-2. **Monthly Price**: Shows the formatted currency amount using the existing Formatter::currency() method
-3. **Service Type**: Always shows "DATA" to indicate it's a data service
-4. **Download Speed**: Automatically converts and displays in appropriate units:
-   - Shows in Kbps if speed < 1000 kbps
-   - Shows in Mbps (converted) if speed >= 1000 kbps
-5. **Upload Speed**: Same conversion logic as download speed
+2. **Monthly Price**: Shows the formatted currency amount using the existing Formatter::currency() method (full width layout)
+3. **Download Speed**: Always displays in Mbps with down arrow icon
+   - Converts from kilobits per second to Mbps (divides by 1000)
+   - Shows 2 decimal places for speeds < 1 Mbps, 0 decimal places for speeds >= 1 Mbps
+4. **Upload Speed**: Always displays in Mbps with up arrow icon
+   - Same conversion logic as download speed
+5. **Service Type**: Removed from display (not shown to end users)
 
 ### Error Handling
 - Uses try-catch block to handle potential API errors
@@ -96,14 +98,22 @@ Added new translation keys to support multiple languages:
 
 ## Requirements Met
 
-✅ **Card Title**: "Your Plan" (translated appropriately)
+✅ **Card Title**: "Internet Plan" (translated appropriately)
 ✅ **Service Name**: Displays the actual service name from Sonar
 ✅ **Amount**: Shows monthly price with proper currency formatting
-✅ **Download Speed**: Displays download speed with automatic unit conversion
-✅ **Upload Speed**: Displays upload speed with automatic unit conversion  
-✅ **Type**: Always shows "DATA" to indicate data service
+✅ **Download Speed**: Displays download speed always in Mbps with down arrow icon
+✅ **Upload Speed**: Displays upload speed always in Mbps with up arrow icon  
+✅ **Type**: "DATA" service type (not displayed to users per feedback)
 ✅ **Account-specific**: Shows data for the logged-in account only
 ✅ **Data Service Filter**: Only shows if account has a data service
+
+## User Feedback Implemented
+
+✅ **Removed Service Type Display**: "Service Type: DATA" no longer shown to end users
+✅ **Added Speed Icons**: Upload speed has up arrow, download speed has down arrow
+✅ **Always Show Mbps**: Both speeds always displayed in Mbps (no Kbps)
+✅ **Card Title Change**: Changed from "Your Plan" to "Internet Plan"
+✅ **Data Fetching Fix**: Enhanced service property detection for correct values
 
 ## Future Enhancements
 
@@ -123,17 +133,28 @@ To test this feature:
 1. Ensure the account has at least one data service assigned
 2. Log in to the customer portal
 3. Navigate to the dashboard
-4. The "Your Plan" card should appear in the left column
-5. Verify all information displays correctly
+4. The "Internet Plan" card should appear in the left column
+5. Verify all information displays correctly:
+   - Service name shows correctly
+   - Monthly price shows actual amount (not $0.00)
+   - Download speed shows in Mbps with down arrow icon
+   - Upload speed shows in Mbps with up arrow icon
+   - Service type is NOT displayed
 6. Test with different language settings
 
 **Without Data Service (Critical Test):**
 1. Use an account that has NO data services (only voice, recurring, or other service types)
 2. Log in to the customer portal
 3. Navigate to the dashboard
-4. The "Your Plan" card should NOT appear
+4. The "Internet Plan" card should NOT appear
 5. No errors should be logged or displayed
 6. Dashboard should function normally
+
+**Debugging Zero Values:**
+If values are showing as zero, check the application logs for the debug information that shows:
+- service_properties: Available properties on the service object
+- service_def_properties: Available properties on the service definition object
+- This will help identify the correct property names for amount and speeds
 
 **Edge Cases:**
 1. Account with empty services array

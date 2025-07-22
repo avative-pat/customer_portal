@@ -1005,12 +1005,37 @@ class BillingController extends Controller
                 // Check if this is a data service and has the required data_service flag
                 if ($serviceDef && isset($serviceDef->data_service) && $serviceDef->data_service === true) {
                     // This is a data service, gather the plan information
+                    // Use the account service amount (what the customer actually pays) vs service definition amount
+                    $serviceAmount = isset($service->amount) ? $service->amount : ($serviceDef->amount ?? 0);
+                    
+                    // Get download and upload speeds, try multiple possible property names
+                    $downloadSpeed = $serviceDef->download_speed_in_kilobits_per_second 
+                        ?? $serviceDef->download_speed_kilobits_per_second 
+                        ?? $serviceDef->download_speed 
+                        ?? 0;
+                    
+                    $uploadSpeed = $serviceDef->upload_speed_in_kilobits_per_second 
+                        ?? $serviceDef->upload_speed_kilobits_per_second 
+                        ?? $serviceDef->upload_speed 
+                        ?? 0;
+                    
+                    // Debug logging to help identify the issue
+                    Log::info('Data service found for account ' . get_user()->account_id, [
+                        'service_id' => $service->id,
+                        'service_name' => $serviceDef->name,
+                        'service_amount' => $serviceAmount,
+                        'download_speed' => $downloadSpeed,
+                        'upload_speed' => $uploadSpeed,
+                        'service_properties' => array_keys((array) $service),
+                        'service_def_properties' => array_keys((array) $serviceDef)
+                    ]);
+                    
                     return (object) [
                         'id' => $service->id,
                         'name' => $serviceDef->name ?? 'Internet Service',
-                        'amount' => $service->amount ?? 0,
-                        'download_speed' => $serviceDef->download_speed_in_kilobits_per_second ?? 0,
-                        'upload_speed' => $serviceDef->upload_speed_in_kilobits_per_second ?? 0,
+                        'amount' => $serviceAmount,
+                        'download_speed' => $downloadSpeed,
+                        'upload_speed' => $uploadSpeed,
                         'type' => 'DATA'
                     ];
                 }
