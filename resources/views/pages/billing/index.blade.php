@@ -104,6 +104,58 @@
             </div>
          </div>
          @endif
+         
+         @if($currentDataService)
+         <!-- Your Plan Card -->
+         <div class="card mt-3">
+            <div class="card-body">
+               <div class="row align-items-center">
+                  <div class="col">
+                     <h6 class="card-title text-uppercase text-muted mb-2">
+                        <i class="fe fe-wifi mr-2"></i>{{utrans("headers.yourPlan")}}
+                     </h6>
+                     <h4 class="mb-3 text-primary">
+                        {{ $currentDataService->name }}
+                     </h4>
+                     
+                     <div class="row mb-2">
+                        <div class="col-6">
+                           <small class="text-muted">{{utrans("headers.monthlyPrice")}}</small>
+                           <div class="h6 mb-0">{{Formatter::currency($currentDataService->amount)}}</div>
+                        </div>
+                        <div class="col-6">
+                           <small class="text-muted">{{utrans("headers.serviceType")}}</small>
+                           <div class="h6 mb-0">{{ $currentDataService->type }}</div>
+                        </div>
+                     </div>
+                     
+                     <div class="row">
+                        <div class="col-6">
+                           <small class="text-muted">{{utrans("headers.downloadSpeed")}}</small>
+                           <div class="h6 mb-0">
+                              @if($currentDataService->download_speed >= 1000)
+                                 {{ number_format($currentDataService->download_speed / 1000, 1) }} {{utrans("headers.mbps")}}
+                              @else
+                                 {{ number_format($currentDataService->download_speed) }} {{utrans("headers.kbps")}}
+                              @endif
+                           </div>
+                        </div>
+                        <div class="col-6">
+                           <small class="text-muted">{{utrans("headers.uploadSpeed")}}</small>
+                           <div class="h6 mb-0">
+                              @if($currentDataService->upload_speed >= 1000)
+                                 {{ number_format($currentDataService->upload_speed / 1000, 1) }} {{utrans("headers.mbps")}}
+                              @else
+                                 {{ number_format($currentDataService->upload_speed) }} {{utrans("headers.kbps")}}
+                              @endif
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         @endif
       </div>
       <div class="col-12 col-xl-8">
          <div class="row">

@@ -88,6 +88,10 @@ class BillingController extends Controller
 
         $services = $this->accountBillingController->getServices(get_user()->account_id);
         $dataServiceId = 0;
+        
+        // Get the user's current data service plan
+        $currentDataService = $this->getCurrentDataService();
+        
         if ($accountDetails->company_id) {
             foreach ($services as $service) {
                 //save a call back to sonar if no label is here to find anyway
@@ -116,7 +120,7 @@ class BillingController extends Controller
 
         return view(
             'pages.billing.index',
-            compact('values', 'invoices', 'transactions', 'paymentMethods', 'systemSetting', 'svg', 'svgDisplay', 'contact')
+            compact('values', 'invoices', 'transactions', 'paymentMethods', 'systemSetting', 'svg', 'svgDisplay', 'contact', 'currentDataService')
         );
     }
 
@@ -973,5 +977,38 @@ class BillingController extends Controller
     private function cleanUrl($url)
     {
         return str_replace('https://', '', str_replace('http://', '', $url));
+    }
+
+    /**
+     * Get the current data service for the account
+     * @return object|null
+     */
+    private function getCurrentDataService()
+    {
+        try {
+            $services = $this->accountBillingController->getServices(get_user()->account_id);
+            
+            foreach ($services as $service) {
+                // Get service definition to check if it's a data service
+                $serviceDef = $this->systemController->getService($service->id);
+                
+                if ($serviceDef && $serviceDef->data_service) {
+                    // This is a data service, gather the plan information
+                    return (object) [
+                        'id' => $service->id,
+                        'name' => $serviceDef->name ?? 'Internet Service',
+                        'amount' => $service->amount ?? 0,
+                        'download_speed' => $serviceDef->download_speed_in_kilobits_per_second ?? 0,
+                        'upload_speed' => $serviceDef->upload_speed_in_kilobits_per_second ?? 0,
+                        'type' => 'DATA'
+                    ];
+                }
+            }
+            
+            return null;
+        } catch (Exception $e) {
+            Log::error('Error fetching current data service: ' . $e->getMessage());
+            return null;
+        }
     }
 }
