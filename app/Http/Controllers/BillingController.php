@@ -89,7 +89,7 @@ class BillingController extends Controller
         $services = $this->accountBillingController->getServices(get_user()->account_id);
         $dataServiceId = 0;
         
-        // Get the user's current data service plan
+        // Get the user's current data service plan (will be null if no data service exists)
         $currentDataService = $this->getCurrentDataService();
         
         if ($accountDetails->company_id) {
@@ -981,18 +981,29 @@ class BillingController extends Controller
 
     /**
      * Get the current data service for the account
-     * @return object|null
+     * @return object|null Returns data service information if found, null if no data service or on error
      */
     private function getCurrentDataService()
     {
         try {
             $services = $this->accountBillingController->getServices(get_user()->account_id);
             
+            // Return null if no services at all
+            if (!$services || empty($services)) {
+                return null;
+            }
+            
             foreach ($services as $service) {
+                // Skip if service doesn't have required properties
+                if (!isset($service->id)) {
+                    continue;
+                }
+                
                 // Get service definition to check if it's a data service
                 $serviceDef = $this->systemController->getService($service->id);
                 
-                if ($serviceDef && $serviceDef->data_service) {
+                // Check if this is a data service and has the required data_service flag
+                if ($serviceDef && isset($serviceDef->data_service) && $serviceDef->data_service === true) {
                     // This is a data service, gather the plan information
                     return (object) [
                         'id' => $service->id,
@@ -1005,9 +1016,11 @@ class BillingController extends Controller
                 }
             }
             
+            // No data service found - this is normal for some accounts
             return null;
         } catch (Exception $e) {
-            Log::error('Error fetching current data service: ' . $e->getMessage());
+            // Log the error but don't expose it to the user
+            Log::warning('Could not fetch data service for account ' . get_user()->account_id . ': ' . $e->getMessage());
             return null;
         }
     }

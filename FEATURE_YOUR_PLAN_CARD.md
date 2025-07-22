@@ -80,9 +80,12 @@ Added new translation keys to support multiple languages:
 
 ### Error Handling
 - Uses try-catch block to handle potential API errors
-- Logs errors using Laravel's Log facade
-- Gracefully returns null if service cannot be fetched
+- Logs warnings (not errors) using Laravel's Log facade to avoid alert fatigue
+- Gracefully returns null if service cannot be fetched OR if no data service exists
 - Card only displays if valid service data is available
+- Handles accounts without data services as a normal scenario (no errors logged)
+- Additional safety checks in Blade template with null coalescing operators
+- Validates service properties exist before accessing them
 
 ### UI/UX Considerations
 - Card is positioned in the left column alongside payment status cards
@@ -115,10 +118,25 @@ Potential improvements that could be made:
 ## Testing Notes
 
 To test this feature:
+
+**With Data Service:**
 1. Ensure the account has at least one data service assigned
 2. Log in to the customer portal
 3. Navigate to the dashboard
 4. The "Your Plan" card should appear in the left column
 5. Verify all information displays correctly
 6. Test with different language settings
-7. Test with accounts that have no data services (card should not appear)
+
+**Without Data Service (Critical Test):**
+1. Use an account that has NO data services (only voice, recurring, or other service types)
+2. Log in to the customer portal
+3. Navigate to the dashboard
+4. The "Your Plan" card should NOT appear
+5. No errors should be logged or displayed
+6. Dashboard should function normally
+
+**Edge Cases:**
+1. Account with empty services array
+2. Account with services but all non-data services
+3. Account with data service but missing properties
+4. API errors when fetching services
