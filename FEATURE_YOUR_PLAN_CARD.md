@@ -151,10 +151,35 @@ To test this feature:
 6. Dashboard should function normally
 
 **Debugging Zero Values:**
-If values are showing as zero, check the application logs for the debug information that shows:
-- service_properties: Available properties on the service object
-- service_def_properties: Available properties on the service definition object
-- This will help identify the correct property names for amount and speeds
+If values are showing as zero, check the application logs for the enhanced debug information that shows:
+- account_service_all_properties: All properties available on the account service object
+- service_def_all_properties: All properties available on the service definition object  
+- account_service_numeric_fields: Numeric fields that might contain pricing information
+- service_def_speed_fields: Fields that might contain speed information
+- calculated_amount: The final amount being used (should match the customer's actual price)
+- calculated_download_speed: The final download speed being used
+- calculated_upload_speed: The final upload speed being used
+
+## Bug Fixes Applied
+
+### Bug #1: Download/Upload Speeds Showing 0.00 Mbps
+**Problem**: Speed values not being retrieved correctly from Sonar API
+**Fix**: Enhanced property name detection with additional fallback options:
+- Added `download_speed_kbps`, `downloadSpeedInKilobitsPerSecond`, `downloadSpeed`
+- Added `upload_speed_kbps`, `uploadSpeedInKilobitsPerSecond`, `uploadSpeed`
+- Enhanced debug logging to show all speed-related fields
+
+### Bug #2: Monthly Price Showing Service Price Instead of Account-Service Price  
+**Problem**: Displaying base service price instead of customer's actual price (including overrides)
+**Fix**: Improved price detection priority:
+1. `$accountService->price` (customer's actual price with overrides)
+2. `$accountService->amount` 
+3. `$accountService->recurring_amount`
+4. `$accountService->monthly_amount`
+5. `$accountService->cost`
+6. `$serviceDef->amount` (fallback to base service price)
+7. `$serviceDef->price`
+8. `0` (final fallback)
 
 **Edge Cases:**
 1. Account with empty services array

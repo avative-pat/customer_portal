@@ -993,47 +993,86 @@ class BillingController extends Controller
                 return null;
             }
             
-            foreach ($services as $service) {
+            foreach ($services as $accountService) {
                 // Skip if service doesn't have required properties
-                if (!isset($service->id)) {
+                if (!isset($accountService->id)) {
                     continue;
                 }
                 
                 // Get service definition to check if it's a data service
-                $serviceDef = $this->systemController->getService($service->id);
+                $serviceDef = $this->systemController->getService($accountService->id);
                 
                 // Check if this is a data service and has the required data_service flag
                 if ($serviceDef && isset($serviceDef->data_service) && $serviceDef->data_service === true) {
                     // This is a data service, gather the plan information
-                    // Use the account service amount (what the customer actually pays) vs service definition amount
-                    $serviceAmount = isset($service->amount) ? $service->amount : ($serviceDef->amount ?? 0);
                     
-                    // Get download and upload speeds, try multiple possible property names
+                    // FIXED: Use account service amount (the actual price the customer pays including overrides)
+                    // Try multiple possible property names for the actual amount charged to customer
+                    $actualAmount = $accountService->price 
+                        ?? $accountService->amount 
+                        ?? $accountService->recurring_amount
+                        ?? $accountService->monthly_amount
+                        ?? $accountService->cost
+                        ?? $serviceDef->amount 
+                        ?? $serviceDef->price
+                        ?? 0;
+                    
+                    // FIXED: Try multiple possible property names for speeds from service definition
                     $downloadSpeed = $serviceDef->download_speed_in_kilobits_per_second 
                         ?? $serviceDef->download_speed_kilobits_per_second 
+                        ?? $serviceDef->download_speed_kbps
                         ?? $serviceDef->download_speed 
+                        ?? $serviceDef->downloadSpeedInKilobitsPerSecond
+                        ?? $serviceDef->downloadSpeed
                         ?? 0;
                     
                     $uploadSpeed = $serviceDef->upload_speed_in_kilobits_per_second 
                         ?? $serviceDef->upload_speed_kilobits_per_second 
+                        ?? $serviceDef->upload_speed_kbps
                         ?? $serviceDef->upload_speed 
+                        ?? $serviceDef->uploadSpeedInKilobitsPerSecond
+                        ?? $serviceDef->uploadSpeed
                         ?? 0;
                     
-                    // Debug logging to help identify the issue
-                    Log::info('Data service found for account ' . get_user()->account_id, [
-                        'service_id' => $service->id,
+                    // Enhanced debug logging to identify the correct property names
+                    $accountServiceArray = (array) $accountService;
+                    $serviceDefArray = (array) $serviceDef;
+                    
+                    Log::info('Data service debugging for account ' . get_user()->account_id, [
+                        'account_service_id' => $accountService->id,
                         'service_name' => $serviceDef->name,
-                        'service_amount' => $serviceAmount,
-                        'download_speed' => $downloadSpeed,
-                        'upload_speed' => $uploadSpeed,
-                        'service_properties' => array_keys((array) $service),
-                        'service_def_properties' => array_keys((array) $serviceDef)
+                        'calculated_amount' => $actualAmount,
+                        'calculated_download_speed' => $downloadSpeed,
+                        'calculated_upload_speed' => $uploadSpeed,
+                        
+                        // Show all properties of account service
+                        'account_service_all_properties' => $accountServiceArray,
+                        
+                        // Show all properties of service definition
+                        'service_def_all_properties' => $serviceDefArray,
+                        
+                        // Filter numeric fields that might be amounts
+                        'account_service_numeric_fields' => array_filter($accountServiceArray, function($value, $key) {
+                            return is_numeric($value) && (strpos(strtolower($key), 'amount') !== false || 
+                                   strpos(strtolower($key), 'price') !== false || 
+                                   strpos(strtolower($key), 'cost') !== false ||
+                                   strpos(strtolower($key), 'recurring') !== false);
+                        }, ARRAY_FILTER_USE_BOTH),
+                        
+                        // Filter speed-related fields from service definition
+                        'service_def_speed_fields' => array_filter($serviceDefArray, function($value, $key) {
+                            return (is_numeric($value) || $value !== null) && (strpos(strtolower($key), 'speed') !== false || 
+                                   strpos(strtolower($key), 'download') !== false || 
+                                   strpos(strtolower($key), 'upload') !== false ||
+                                   strpos(strtolower($key), 'kbps') !== false ||
+                                   strpos(strtolower($key), 'mbps') !== false);
+                        }, ARRAY_FILTER_USE_BOTH)
                     ]);
                     
                     return (object) [
-                        'id' => $service->id,
+                        'id' => $accountService->id,
                         'name' => $serviceDef->name ?? 'Internet Service',
-                        'amount' => $serviceAmount,
+                        'amount' => $actualAmount,
                         'download_speed' => $downloadSpeed,
                         'upload_speed' => $uploadSpeed,
                         'type' => 'DATA'
