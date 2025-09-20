@@ -104,6 +104,60 @@
             </div>
          </div>
          @endif
+         
+         @if(isset($currentDataService) && $currentDataService)
+         <!-- Internet Plan Card -->
+         <div class="card mt-3">
+            <div class="card-body">
+               <div class="row align-items-center">
+                  <div class="col">
+                     <h6 class="card-title text-uppercase text-muted mb-2">
+                        <i class="fe fe-wifi mr-2"></i>{{utrans("headers.internetPlan")}}
+                     </h6>
+                     <h4 class="mb-3 text-primary">
+                        {{ $currentDataService->name ?? 'Data Service' }}
+                     </h4>
+                     
+                     <div class="row mb-2">
+                        <div class="col-12">
+                           <small class="text-muted">{{utrans("headers.monthlyPrice")}}</small>
+                           <div class="h6 mb-0">{{Formatter::currency($currentDataService->amount ?? 0)}}</div>
+                        </div>
+                     </div>
+                     
+                     <div class="row">
+                        <div class="col-6">
+                           <small class="text-muted">
+                              <i class="fe fe-arrow-down mr-1"></i>{{utrans("headers.downloadSpeed")}}
+                           </small>
+                           <div class="h6 mb-0">
+                              @php
+                                 $downloadSpeed = $currentDataService->download_speed ?? 0;
+                                 // Always display in Mbps
+                                 $downloadMbps = $downloadSpeed >= 1000 ? $downloadSpeed / 1000 : $downloadSpeed / 1000;
+                              @endphp
+                              {{ number_format($downloadMbps, $downloadMbps < 1 ? 2 : 0) }} {{utrans("headers.mbps")}}
+                           </div>
+                        </div>
+                        <div class="col-6">
+                           <small class="text-muted">
+                              <i class="fe fe-arrow-up mr-1"></i>{{utrans("headers.uploadSpeed")}}
+                           </small>
+                           <div class="h6 mb-0">
+                              @php
+                                 $uploadSpeed = $currentDataService->upload_speed ?? 0;
+                                 // Always display in Mbps
+                                 $uploadMbps = $uploadSpeed >= 1000 ? $uploadSpeed / 1000 : $uploadSpeed / 1000;
+                              @endphp
+                              {{ number_format($uploadMbps, $uploadMbps < 1 ? 2 : 0) }} {{utrans("headers.mbps")}}
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         @endif
       </div>
       <div class="col-12 col-xl-8">
          <div class="row">

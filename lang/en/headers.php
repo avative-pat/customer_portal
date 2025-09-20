@@ -34,4 +34,12 @@ return [
     'autopay' => 'Autopay',
     'goCardLess' => 'GoCardless',
     'account' => 'Account',
+    'internetPlan' => 'Internet Plan',
+    'serviceDetails' => 'Service Details',
+    'downloadSpeed' => 'Download Speed',
+    'uploadSpeed' => 'Upload Speed',
+    'monthlyPrice' => 'Monthly Price',
+    'serviceType' => 'Service Type',
+    'mbps' => 'Mbps',
+    'kbps' => 'Kbps',
 ];

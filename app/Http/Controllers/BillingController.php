@@ -88,6 +88,10 @@ class BillingController extends Controller
 
         $services = $this->accountBillingController->getServices(get_user()->account_id);
         $dataServiceId = 0;
+        
+        // Get the user's current data service plan (will be null if no data service exists)
+        $currentDataService = $this->getCurrentDataService();
+        
         if ($accountDetails->company_id) {
             foreach ($services as $service) {
                 //save a call back to sonar if no label is here to find anyway
@@ -116,7 +120,7 @@ class BillingController extends Controller
 
         return view(
             'pages.billing.index',
-            compact('values', 'invoices', 'transactions', 'paymentMethods', 'systemSetting', 'svg', 'svgDisplay', 'contact')
+            compact('values', 'invoices', 'transactions', 'paymentMethods', 'systemSetting', 'svg', 'svgDisplay', 'contact', 'currentDataService')
         );
     }
 
@@ -973,5 +977,115 @@ class BillingController extends Controller
     private function cleanUrl($url)
     {
         return str_replace('https://', '', str_replace('http://', '', $url));
+    }
+
+    /**
+     * Get the current data service for the account
+     * @return object|null Returns data service information if found, null if no data service or on error
+     */
+    private function getCurrentDataService()
+    {
+        try {
+            $services = $this->accountBillingController->getServices(get_user()->account_id);
+            
+            // Return null if no services at all
+            if (!$services || empty($services)) {
+                return null;
+            }
+            
+            foreach ($services as $accountService) {
+                // Skip if service doesn't have required properties
+                if (!isset($accountService->id)) {
+                    continue;
+                }
+                
+                // Get service definition to check if it's a data service
+                $serviceDef = $this->systemController->getService($accountService->id);
+                
+                // Check if this is a data service and has the required data_service flag
+                if ($serviceDef && isset($serviceDef->data_service) && $serviceDef->data_service === true) {
+                    // This is a data service, gather the plan information
+                    
+                    // FIXED: Use account service amount (the actual price the customer pays including overrides)
+                    // Try multiple possible property names for the actual amount charged to customer
+                    $actualAmount = $accountService->price 
+                        ?? $accountService->amount 
+                        ?? $accountService->recurring_amount
+                        ?? $accountService->monthly_amount
+                        ?? $accountService->cost
+                        ?? $serviceDef->amount 
+                        ?? $serviceDef->price
+                        ?? 0;
+                    
+                    // FIXED: Try multiple possible property names for speeds from service definition
+                    $downloadSpeed = $serviceDef->download_speed_in_kilobits_per_second 
+                        ?? $serviceDef->download_speed_kilobits_per_second 
+                        ?? $serviceDef->download_speed_kbps
+                        ?? $serviceDef->download_speed 
+                        ?? $serviceDef->downloadSpeedInKilobitsPerSecond
+                        ?? $serviceDef->downloadSpeed
+                        ?? 0;
+                    
+                    $uploadSpeed = $serviceDef->upload_speed_in_kilobits_per_second 
+                        ?? $serviceDef->upload_speed_kilobits_per_second 
+                        ?? $serviceDef->upload_speed_kbps
+                        ?? $serviceDef->upload_speed 
+                        ?? $serviceDef->uploadSpeedInKilobitsPerSecond
+                        ?? $serviceDef->uploadSpeed
+                        ?? 0;
+                    
+                    // Enhanced debug logging to identify the correct property names
+                    $accountServiceArray = (array) $accountService;
+                    $serviceDefArray = (array) $serviceDef;
+                    
+                    Log::info('Data service debugging for account ' . get_user()->account_id, [
+                        'account_service_id' => $accountService->id,
+                        'service_name' => $serviceDef->name,
+                        'calculated_amount' => $actualAmount,
+                        'calculated_download_speed' => $downloadSpeed,
+                        'calculated_upload_speed' => $uploadSpeed,
+                        
+                        // Show all properties of account service
+                        'account_service_all_properties' => $accountServiceArray,
+                        
+                        // Show all properties of service definition
+                        'service_def_all_properties' => $serviceDefArray,
+                        
+                        // Filter numeric fields that might be amounts
+                        'account_service_numeric_fields' => array_filter($accountServiceArray, function($value, $key) {
+                            return is_numeric($value) && (strpos(strtolower($key), 'amount') !== false || 
+                                   strpos(strtolower($key), 'price') !== false || 
+                                   strpos(strtolower($key), 'cost') !== false ||
+                                   strpos(strtolower($key), 'recurring') !== false);
+                        }, ARRAY_FILTER_USE_BOTH),
+                        
+                        // Filter speed-related fields from service definition
+                        'service_def_speed_fields' => array_filter($serviceDefArray, function($value, $key) {
+                            return (is_numeric($value) || $value !== null) && (strpos(strtolower($key), 'speed') !== false || 
+                                   strpos(strtolower($key), 'download') !== false || 
+                                   strpos(strtolower($key), 'upload') !== false ||
+                                   strpos(strtolower($key), 'kbps') !== false ||
+                                   strpos(strtolower($key), 'mbps') !== false);
+                        }, ARRAY_FILTER_USE_BOTH)
+                    ]);
+                    
+                    return (object) [
+                        'id' => $accountService->id,
+                        'name' => $serviceDef->name ?? 'Internet Service',
+                        'amount' => $actualAmount,
+                        'download_speed' => $downloadSpeed,
+                        'upload_speed' => $uploadSpeed,
+                        'type' => 'DATA'
+                    ];
+                }
+            }
+            
+            // No data service found - this is normal for some accounts
+            return null;
+        } catch (Exception $e) {
+            // Log the error but don't expose it to the user
+            Log::warning('Could not fetch data service for account ' . get_user()->account_id . ': ' . $e->getMessage());
+            return null;
+        }
     }
 }
